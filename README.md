@@ -1,2 +1,436 @@
-# customer-shopping-behavior-analysis
-End-to-end data analytics project analyzing customer shopping behavior using Python, SQL, and Power BI.
+# Customer Behaviour Analysis
+
+An end-to-end data analytics project that analyzes customer shopping behaviour, purchasing patterns, product performance, subscription behaviour, discount usage, customer segments, and revenue contribution using **Python, SQL, MySQL, and Power BI**.
+
+**Workflow:** Raw Dataset → Python/Pandas → MySQL → SQL Analysis → Power BI Dashboard → Business Insights
+
+---
+
+## 📌 Project Overview
+
+This project explores customer shopping behaviour using **3,900 customer purchase records** and transforms raw data into meaningful business insights.
+
+The analysis covers:
+
+* Customer purchasing patterns
+* Revenue and sales performance
+* Product performance
+* Subscription behaviour
+* Discount and promotional usage
+* Customer loyalty and segmentation
+* Shipping preferences
+* Revenue across categories and age groups
+
+The project demonstrates a complete **end-to-end data analytics workflow**, from data cleaning and transformation to SQL analysis and interactive dashboard development.
+
+---
+
+## 🎯 Objectives
+
+* Analyze customer purchasing behaviour
+* Identify revenue patterns across customer groups
+* Evaluate product performance and customer ratings
+* Compare subscribers and non-subscribers
+* Analyze discount usage and promotional behaviour
+* Segment customers based on previous purchases
+* Analyze revenue and sales by product category
+* Analyze customer behaviour across age groups
+* Build an interactive Power BI dashboard
+* Generate actionable business insights
+
+---
+
+## 📊 Dataset
+
+The dataset contains:
+
+* **3,900 customer purchase records**
+* **18 original fields**
+
+### Key Fields
+
+| Field                  | Description                    |
+| ---------------------- | ------------------------------ |
+| Customer ID            | Unique customer identifier     |
+| Age                    | Customer age                   |
+| Gender                 | Customer gender                |
+| Item Purchased         | Product purchased              |
+| Category               | Product category               |
+| Purchase Amount        | Purchase amount in USD         |
+| Location               | Customer location              |
+| Size                   | Product size                   |
+| Color                  | Product colour                 |
+| Season                 | Purchase season                |
+| Review Rating          | Customer review rating         |
+| Subscription Status    | Customer subscription status   |
+| Shipping Type          | Shipping method                |
+| Discount Applied       | Whether a discount was applied |
+| Promo Code Used        | Whether a promo code was used  |
+| Previous Purchases     | Number of previous purchases   |
+| Payment Method         | Payment method used            |
+| Frequency of Purchases | Customer purchase frequency    |
+
+---
+
+## 🛠️ Tools & Technologies
+
+* **Python**
+* **Pandas**
+* **Jupyter Notebook**
+* **MySQL**
+* **SQL**
+* **SQLAlchemy**
+* **PyMySQL**
+* **Power BI**
+
+---
+
+# 🐍 Python Data Cleaning & Preparation
+
+Python and Pandas were used to inspect, clean, transform, and prepare the dataset for analysis.
+
+### Data Inspection
+
+```python
+df.head()
+df.info()
+df.describe(include='all')
+df.isnull().sum()
+```
+
+### Handling Missing Values
+
+Missing `Review Rating` values were filled using the **median rating within each product category**.
+
+```python
+df['Review Rating'] = df.groupby('Category')['Review Rating'].transform(
+    lambda x: x.fillna(x.median())
+)
+```
+
+### Column Standardization
+
+The dataset was standardized by:
+
+* Converting column names to lowercase
+* Replacing spaces with underscores
+* Renaming `purchase_amount_(usd)` to `purchase_amount`
+
+### Feature Engineering
+
+Additional features were created to improve analysis.
+
+#### Age Group
+
+Customers were grouped into four age segments using quartiles:
+
+* Young-Adult
+* Adult
+* Middle-Age
+* Senior
+
+#### Purchase Frequency
+
+Purchase frequency categories were converted into approximate day values for analytical purposes.
+
+Categories included:
+
+* Weekly
+* Fortnightly
+* Bi-Weekly
+* Monthly
+* Quarterly
+* Every 3 Months
+* Annually
+
+The relationship between `discount_applied` and `promo_code_used` was also evaluated, and the redundant `promo_code_used` column was removed.
+
+---
+
+# 🗄️ MySQL Integration
+
+The cleaned Pandas DataFrame was loaded into MySQL using **SQLAlchemy** and **PyMySQL**.
+
+```python
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+)
+
+df.to_sql(
+    "customer",
+    engine,
+    if_exists="replace",
+    index=False
+)
+```
+
+The cleaned dataset was stored in the:
+
+```text
+customer_behaviour
+└── customer
+```
+
+MySQL table.
+
+---
+
+# 🔎 SQL Business Analysis
+
+The project contains **10 business questions** designed to evaluate customer behaviour and business performance.
+
+### 1. Revenue by Gender
+
+Calculates total revenue generated by male and female customers using:
+
+* `SUM()`
+* `GROUP BY`
+
+### 2. Customers Spending Above Average
+
+Identifies customers whose purchase amount is above the overall average while also having a discount applied.
+
+Techniques:
+
+* Subqueries
+* `AVG()`
+* Filtering conditions
+
+### 3. Top 5 Products by Average Review Rating
+
+Identifies the five products with the highest average customer ratings.
+
+Techniques:
+
+* `AVG()`
+* `ROUND()`
+* `ORDER BY`
+* `LIMIT`
+
+### 4. Average Purchase Amount by Shipping Type
+
+Compares average purchase amounts between different shipping methods.
+
+### 5. Subscribers vs Non-Subscribers
+
+Compares:
+
+* Customer count
+* Average spending
+* Total revenue
+
+between subscribers and non-subscribers.
+
+### 6. Top 5 Products by Discount Rate
+
+Calculates the percentage of purchases where a discount was applied.
+
+Techniques:
+
+* `CASE`
+* Aggregation
+* Percentage calculations
+
+### 7. Customer Segmentation
+
+Customers are classified based on their previous purchases:
+
+* **New**
+* **Returning**
+* **Loyal**
+
+### 8. Top 3 Products Within Each Category
+
+Identifies the top three products within each product category using:
+
+* CTE
+* `ROW_NUMBER()`
+* Window functions
+
+### 9. Repeat Buyers & Subscription Status
+
+Analyzes customers with more than five previous purchases and evaluates their subscription status.
+
+### 10. Revenue by Age Group
+
+Calculates total revenue generated by each customer age group.
+
+---
+
+# 📈 Power BI Dashboard
+
+The project includes an interactive **Customer Behaviour Dashboard** designed to provide a high-level view of customer and sales performance.
+
+### KPI Cards
+
+| KPI                     |      Value |
+| ----------------------- | ---------: |
+| Customers               |   **3.9K** |
+| Average Purchase Amount | **$59.76** |
+| Average Review Rating   |   **3.75** |
+
+### Dashboard Filters
+
+Users can interact with the dashboard using:
+
+* Subscription Status
+* Gender
+* Category
+* Shipping Type
+
+### Dashboard Visualizations
+
+* Customer percentage by Subscription Status
+* Revenue by Category
+* Sales by Category
+* Revenue by Age Group
+* Sales by Age Group
+
+---
+
+## 💡 Dashboard Insights
+
+### Subscription Behaviour
+
+**73%** of customers are non-subscribers, while **27%** are subscribers.
+
+This indicates an opportunity to increase subscription adoption through loyalty benefits, exclusive offers, and targeted campaigns.
+
+### Product Categories
+
+**Clothing** generates the highest revenue among the displayed categories, followed by:
+
+1. Clothing
+2. Accessories
+3. Footwear
+4. Outerwear
+
+Clothing also records the highest sales volume.
+
+### Age Groups
+
+**Young-Adult** customers contribute the highest revenue and sales volume among the four age groups.
+
+This segment could therefore be an important target for future marketing campaigns.
+
+### Customer Loyalty
+
+The SQL analysis categorizes customers into **New, Returning, and Loyal** segments, providing a foundation for targeted retention strategies.
+
+### Discount Strategy
+
+Product-level discount rates can help identify products that frequently depend on promotions and support more effective discount planning.
+
+---
+
+# 📁 Project Structure
+
+```text
+customer-behaviour-analysis/
+│
+├── README.md
+├── data/
+│   └── customer_shopping_behavior.csv
+│
+├── sql/
+│   └── customer_analysis.sql
+│
+├── notebooks/
+│   └── customer_behavior_analysis.ipynb
+│
+├── powerbi/
+│   └── customer_behaviour_dashboard.pbix
+│
+├── images/
+│   └── customer_behaviour_dashboard.png
+│
+└── requirements.txt
+```
+
+---
+
+# 🧠 Skills Demonstrated
+
+### Programming & Data Analysis
+
+* Python
+* Pandas
+* Data Cleaning
+* Exploratory Data Analysis
+* Feature Engineering
+
+### Database & SQL
+
+* MySQL
+* SQL
+* Aggregate Functions
+* Subqueries
+* `CASE` Statements
+* CTEs
+* Window Functions
+* Customer Segmentation
+
+### Visualization & BI
+
+* Power BI
+* Data Visualization
+* Dashboard Development
+* Business Intelligence
+
+### Data Integration
+
+* SQLAlchemy
+* PyMySQL
+* Python–MySQL Integration
+
+### Business Analysis
+
+* Customer Behaviour Analysis
+* Revenue Analysis
+* Product Performance Analysis
+* Customer Segmentation
+* Subscription Analysis
+* Discount Analysis
+
+---
+
+# 🔄 Project Workflow
+
+```text
+Raw Customer Dataset
+        ↓
+Python / Pandas
+        ↓
+Data Cleaning
+        ↓
+Feature Engineering
+        ↓
+MySQL Database
+        ↓
+SQL Business Analysis
+        ↓
+Power BI Dashboard
+        ↓
+Business Insights
+```
+
+---
+
+# 👤 Author
+
+**V. Lingamoorthy**
+
+**Data Analytics | Python | SQL | Power BI**
+
+---
+
+## 📌 Project Summary
+
+This project demonstrates an end-to-end **Data Analytics workflow**, transforming raw customer shopping data into meaningful business insights.
+
+The project combines **Python and Pandas for data preparation, MySQL and SQL for business analysis, and Power BI for interactive visualization and reporting**.
+
+It demonstrates practical skills in **data cleaning, feature engineering, SQL analysis, customer segmentation, dashboard development, and business insight generation**.
+
